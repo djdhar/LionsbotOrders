@@ -1,9 +1,6 @@
 package com.lionsbot.evaluation.dibyajyoti.controller;
 
-import com.lionsbot.evaluation.dibyajyoti.entity.AuthenticationRequest;
-import com.lionsbot.evaluation.dibyajyoti.entity.AuthenticationResponse;
-import com.lionsbot.evaluation.dibyajyoti.entity.Customer;
-import com.lionsbot.evaluation.dibyajyoti.entity.Order;
+import com.lionsbot.evaluation.dibyajyoti.entity.*;
 import com.lionsbot.evaluation.dibyajyoti.service.CustomerService;
 import com.lionsbot.evaluation.dibyajyoti.service.OrderService;
 import com.lionsbot.evaluation.dibyajyoti.utils.JwtUtil;
@@ -29,47 +26,52 @@ public class ServiceController {
     JwtUtil jwtTokenUtil;
 
     @GetMapping("/orders")
-    public List<Order> findAllOrders() {
-        return orderService.getOrders();
+    public List<Order> findAllOrders(@RequestHeader("Authorization") String token) {
+        return orderService.getOrders(token);
     }
 
     @GetMapping("/customers")
-    public List<Customer> findAllCustomers() {
-        return customerService.getCustomers();
+    public List<Customer> findAllCustomers(@RequestHeader("Authorization") String token) {
+        return customerService.getCustomers(token);
     }
 
     @GetMapping("/orders/{customer_id}")
-    public List<Order> findOrdersByCustomerId(@PathVariable int customer_id) {
-        return orderService.getOrdersByCustomerId(customer_id);
+    public List<Order> findOrdersByCustomerId(@PathVariable int customer_id, @RequestHeader("Authorization") String token) {
+        return orderService.getOrdersByCustomerId(customer_id, token);
     }
 
     @PutMapping("/orders/{order_id}")
-    public Order updateOrder(@PathVariable int order_id, @RequestBody Order order) {
-        return orderService.modifyOrder(order_id, order);
+    public Order updateOrder(@PathVariable int order_id, @RequestBody Order order, @RequestHeader("Authorization") String token) {
+        return orderService.modifyOrder(order_id, order, token);
+    }
+
+    @PutMapping("/changepassword/{customer_id}")
+    public Customer updatePassword(@PathVariable int customer_id, @RequestBody ChangeCustomerRequest changeCustomerRequest, @RequestHeader("Authorization") String token) {
+        return customerService.changePassword(customer_id, changeCustomerRequest, token);
     }
 
     @PostMapping("/orders")
-    public Order addOrder(@RequestBody Order order) {
-        return orderService.addOrder(order);
+    public Order addOrder(@RequestBody Order order, @RequestHeader("Authorization") String token) {
+        return orderService.addOrder(order, token);
     }
 
     @PostMapping("/customers")
-    public Customer addCustomer(@RequestBody Customer customer) {
-        return customerService.addCustomer(customer);
+    public Customer addCustomer(@RequestBody Customer customer, @RequestHeader("Authorization") String token) {
+        return customerService.addCustomer(customer, token);
     }
 
     @DeleteMapping("/orders/{orderId}")
-    public String deleteOrder(@PathVariable int orderId) {
-        return orderService.deleteOrder(orderId);
+    public String deleteOrder(@PathVariable int orderId, @RequestHeader("Authorization") String token) {
+        return orderService.deleteOrder(orderId, token);
     }
 
 
     @DeleteMapping("/customers/{customerId}")
-    public String deleteCustomer(@PathVariable int customerId) {
-        return customerService.deleteCustomer(customerId);
+    public String deleteCustomer(@PathVariable int customerId , @RequestHeader("Authorization") String token) {
+        return customerService.deleteCustomer(customerId, token);
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/auth/login", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
         System.out.println(authenticationRequest.toString());
         try {

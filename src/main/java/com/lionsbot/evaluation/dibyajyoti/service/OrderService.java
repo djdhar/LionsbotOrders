@@ -1,9 +1,9 @@
 package com.lionsbot.evaluation.dibyajyoti.service;
 
-import com.lionsbot.evaluation.dibyajyoti.entity.Customer;
 import com.lionsbot.evaluation.dibyajyoti.entity.Order;
 import com.lionsbot.evaluation.dibyajyoti.repository.CustomerRepository;
 import com.lionsbot.evaluation.dibyajyoti.repository.OrderRepository;
+import com.lionsbot.evaluation.dibyajyoti.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,37 +20,48 @@ public class OrderService {
     @Autowired
     CustomerRepository customerRepository;
 
-    public List<Order> getOrders() {
-        return orderRepository.findAll();
-    }
+    @Autowired
+    JwtUtil jwtUtil;
 
-    public List<Order> getOrdersByCustomerId(Integer customerId) {
-        return orderRepository.getOrdersByCustomerId(customerId);
-    }
-
-    public Order addOrder(Order order) {
-        order.setOrderDate(new Date());
-        if(customerRepository.findById(order.getCustomerId()).isPresent()) {
-            return orderRepository.save(order);
-        }
+    public List<Order> getOrders(String token) {
+        if(jwtUtil.isAdminToken(token))
+            return orderRepository.findAll();
         return null;
     }
 
-    public Order modifyOrder(int orderId, Order order) {
+    public List<Order> getOrdersByCustomerId(Integer customerId, String token) {
+        if(jwtUtil.isAdminToken(token) ||
+                jwtUtil.extractUsername(token.substring(7)).equals(String.valueOf(customerId)))
+            return orderRepository.getOrdersByCustomerId(customerId);
+        return null;
+    }
+
+    public Order addOrder(Order order, String token) {
+        if(jwtUtil.isAdminToken(token)) return null;
+        order.setOrderDate(new Date());
+        order.setCustomerId(Integer.parseInt(jwtUtil.extractUsername(token.substring(7))));
+        return orderRepository.save(order);
+    }
+
+    public Order modifyOrder(int orderId, Order order, String token) {
         Optional<Order> dbOrder = orderRepository.findById(orderId);
-        Optional<Customer> dbCustomer = customerRepository.findById(order.getCustomerId());
-        if(!dbCustomer.isPresent()) return null;
         if(!dbOrder.isPresent()) return null;
+        if(!jwtUtil.extractUsername(token.substring(7)).equals(String.valueOf(dbOrder.get().getCustomerId()))) return null;
         Order actualOrder = dbOrder.get();
         actualOrder.setTotalPrice(order.getTotalPrice());
         actualOrder.setNumberOfItems(order.getNumberOfItems());
         actualOrder.setOrderDate(order.getOrderDate());
-        actualOrder.setCustomerId(order.getCustomerId());
         return orderRepository.save(actualOrder);
     }
 
-    public String deleteOrder(int id) {
-        orderRepository.deleteById(id);
+    public String deleteOrder(int id, String token) {
+        String userId = jwtUtil.extractUsername(token.substring(7));
+        if(userId.endsWith("_ADMIN_")) {
+            orderRepository.deleteById(id);
+        }
+        Optional<Order> dbOrder = orderRepository.findById(id);
+        if(dbOrder.isPresent() && String.valueOf(dbOrder.get().getCustomerId()).equals(userId))
+            orderRepository.deleteById(id);
         return "order removed !! " + id;
     }
 }

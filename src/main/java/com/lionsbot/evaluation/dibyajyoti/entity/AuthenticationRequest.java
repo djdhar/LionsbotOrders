@@ -40,10 +40,10 @@ public class AuthenticationRequest implements Serializable {
 
     }
 
-//    public AuthenticationRequest(String userId, String password) {
-//        this.setUserId(userId);
-//        this.setPassword(password);
-//    }
+    public AuthenticationRequest(String userId, String password) {
+        this.setUserId(userId);
+        this.setPassword(password);
+    }
 
     public AuthenticationRequest(String userId, String password, String isAdmin) {
         this.setUserId(userId);

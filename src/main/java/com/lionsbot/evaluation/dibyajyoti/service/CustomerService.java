@@ -1,11 +1,13 @@
 package com.lionsbot.evaluation.dibyajyoti.service;
 
 import com.lionsbot.evaluation.dibyajyoti.entity.Admin;
+import com.lionsbot.evaluation.dibyajyoti.entity.ChangeCustomerRequest;
 import com.lionsbot.evaluation.dibyajyoti.entity.Customer;
 import com.lionsbot.evaluation.dibyajyoti.entity.Order;
 import com.lionsbot.evaluation.dibyajyoti.repository.AdminRepository;
 import com.lionsbot.evaluation.dibyajyoti.repository.CustomerRepository;
 import com.lionsbot.evaluation.dibyajyoti.repository.OrderRepository;
+import com.lionsbot.evaluation.dibyajyoti.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,15 +32,23 @@ public class CustomerService implements UserDetailsService {
     @Autowired
     OrderRepository orderRepository;
 
-    public List<Customer> getCustomers() {
-        return customerRepository.findAll();
+    @Autowired
+    JwtUtil jwtUtil;
+
+    public List<Customer> getCustomers(String token) {
+        if(jwtUtil.isAdminToken(token))
+            return customerRepository.findAll();
+        return null;
     }
 
-    public Customer addCustomer(Customer customer) {
-        return customerRepository.save(customer);
+    public Customer addCustomer(Customer customer, String token) {
+        if(jwtUtil.isAdminToken(token))
+            return customerRepository.save(customer);
+        return null;
     }
 
-    public String deleteCustomer(int id) {
+    public String deleteCustomer(int id, String token) {
+        if(!jwtUtil.isAdminToken(token)) return "Admin can delete only";
         List<Order> orders = orderRepository.getOrdersByCustomerId(id);
         List<Integer> orderIds = orders.stream().map(Order::getId)
                 .collect(Collectors.toList());
@@ -63,6 +73,18 @@ public class CustomerService implements UserDetailsService {
         System.out.println("Customer is found " + customer.get());
         return new User(String.valueOf(customer.get().getId()), customer.get().getPassword(),
                 new ArrayList<>());
+    }
+
+    public Customer changePassword(int customerId, ChangeCustomerRequest changeCustomerRequest, String bearerToken) {
+        if(jwtUtil.extractUsername(bearerToken.substring(7)).equals(String.valueOf(customerId))) {
+            Optional<Customer> customer = customerRepository.findById(customerId);
+            if(customer.isPresent()) {
+                Customer dbCustomer = customer.get();
+                dbCustomer.setPassword(changeCustomerRequest.getPassword());
+                return customerRepository.save(dbCustomer);
+            }
+        }
+        return null;
     }
 
     private boolean isAdmin(String username) {
