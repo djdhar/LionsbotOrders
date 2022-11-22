@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,12 +18,14 @@ import java.util.Date;
 public class Order {
 
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column(length = 36)
+    private String id;
 
     @NonNull
-    @Column(name = "customer_id")
-    private int customerId;
+    @Column(name = "customer_id", length = 36)
+    private String customerId;
 
     @NonNull
     private Date orderDate;

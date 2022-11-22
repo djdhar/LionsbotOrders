@@ -36,17 +36,17 @@ public class ServiceController {
     }
 
     @GetMapping("/orders/{customer_id}")
-    public List<Order> findOrdersByCustomerId(@PathVariable int customer_id, @RequestHeader("Authorization") String token) {
+    public List<Order> findOrdersByCustomerId(@PathVariable String customer_id, @RequestHeader("Authorization") String token) {
         return orderService.getOrdersByCustomerId(customer_id, token);
     }
 
     @PutMapping("/orders/{order_id}")
-    public Order updateOrder(@PathVariable int order_id, @RequestBody Order order, @RequestHeader("Authorization") String token) {
+    public Order updateOrder(@PathVariable String order_id, @RequestBody Order order, @RequestHeader("Authorization") String token) {
         return orderService.modifyOrder(order_id, order, token);
     }
 
     @PutMapping("/changepassword/{customer_id}")
-    public Customer updatePassword(@PathVariable int customer_id, @RequestBody ChangeCustomerRequest changeCustomerRequest, @RequestHeader("Authorization") String token) {
+    public Customer updatePassword(@PathVariable String customer_id, @RequestBody ChangeCustomerRequest changeCustomerRequest, @RequestHeader("Authorization") String token) {
         return customerService.changePassword(customer_id, changeCustomerRequest, token);
     }
 
@@ -61,13 +61,13 @@ public class ServiceController {
     }
 
     @DeleteMapping("/orders/{orderId}")
-    public String deleteOrder(@PathVariable int orderId, @RequestHeader("Authorization") String token) {
+    public String deleteOrder(@PathVariable String orderId, @RequestHeader("Authorization") String token) {
         return orderService.deleteOrder(orderId, token);
     }
 
 
     @DeleteMapping("/customers/{customerId}")
-    public String deleteCustomer(@PathVariable int customerId , @RequestHeader("Authorization") String token) {
+    public String deleteCustomer(@PathVariable String customerId , @RequestHeader("Authorization") String token) {
         return customerService.deleteCustomer(customerId, token);
     }
 

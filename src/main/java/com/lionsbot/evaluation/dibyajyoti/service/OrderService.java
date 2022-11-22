@@ -29,7 +29,7 @@ public class OrderService {
         return null;
     }
 
-    public List<Order> getOrdersByCustomerId(Integer customerId, String token) {
+    public List<Order> getOrdersByCustomerId(String customerId, String token) {
         if(jwtUtil.isAdminToken(token) ||
                 jwtUtil.extractUsername(token.substring(7)).equals(String.valueOf(customerId)))
             return orderRepository.getOrdersByCustomerId(customerId);
@@ -39,11 +39,11 @@ public class OrderService {
     public Order addOrder(Order order, String token) {
         if(jwtUtil.isAdminToken(token)) return null;
         order.setOrderDate(new Date());
-        order.setCustomerId(Integer.parseInt(jwtUtil.extractUsername(token.substring(7))));
+        order.setCustomerId((jwtUtil.extractUsername(token.substring(7))));
         return orderRepository.save(order);
     }
 
-    public Order modifyOrder(int orderId, Order order, String token) {
+    public Order modifyOrder(String orderId, Order order, String token) {
         Optional<Order> dbOrder = orderRepository.findById(orderId);
         if(!dbOrder.isPresent()) return null;
         if(!jwtUtil.extractUsername(token.substring(7)).equals(String.valueOf(dbOrder.get().getCustomerId()))) return null;
@@ -54,7 +54,7 @@ public class OrderService {
         return orderRepository.save(actualOrder);
     }
 
-    public String deleteOrder(int id, String token) {
+    public String deleteOrder(String id, String token) {
         String userId = jwtUtil.extractUsername(token.substring(7));
         if(userId.endsWith("_ADMIN_")) {
             orderRepository.deleteById(id);

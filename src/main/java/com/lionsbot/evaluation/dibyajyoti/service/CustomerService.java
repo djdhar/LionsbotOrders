@@ -47,10 +47,10 @@ public class CustomerService implements UserDetailsService {
         return null;
     }
 
-    public String deleteCustomer(int id, String token) {
+    public String deleteCustomer(String id, String token) {
         if(!jwtUtil.isAdminToken(token)) return "Admin can delete only";
         List<Order> orders = orderRepository.getOrdersByCustomerId(id);
-        List<Integer> orderIds = orders.stream().map(Order::getId)
+        List<String> orderIds = orders.stream().map(Order::getId)
                 .collect(Collectors.toList());
         orderRepository.deleteAllById(orderIds);
         customerRepository.deleteById(id);
@@ -62,20 +62,20 @@ public class CustomerService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if(isAdmin(username)) {
             Optional<Admin> admin = adminRepository.findById(
-                    Integer.parseInt(username.substring(0, username.length()-7))
+                    (username.substring(0, username.length()-7))
             );
             if(!admin.isPresent()) throw new UsernameNotFoundException("admin Not found");
             System.out.println("Customer is found " + admin.get());
             return new User(username, admin.get().getPassword(), new ArrayList<>());
         }
-        Optional<Customer> customer = customerRepository.findById(Integer.parseInt(username));
+        Optional<Customer> customer = customerRepository.findById((username));
         if(!customer.isPresent()) throw new UsernameNotFoundException("customer Not found");
         System.out.println("Customer is found " + customer.get());
         return new User(String.valueOf(customer.get().getId()), customer.get().getPassword(),
                 new ArrayList<>());
     }
 
-    public Customer changePassword(int customerId, ChangeCustomerRequest changeCustomerRequest, String bearerToken) {
+    public Customer changePassword(String customerId, ChangeCustomerRequest changeCustomerRequest, String bearerToken) {
         if(jwtUtil.extractUsername(bearerToken.substring(7)).equals(String.valueOf(customerId))) {
             Optional<Customer> customer = customerRepository.findById(customerId);
             if(customer.isPresent()) {

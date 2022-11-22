@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,19 +18,21 @@ import java.util.Date;
 public class Shipment {
 
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column(length = 36)
+    private String id;
 
     @NonNull
-    @Column(name = "order_id")
-    private int orderId;
+    @Column(name = "order_id", length = 36)
+    private String orderId;
 
     @NonNull
     private Date shipmentDate;
 
     @NonNull
-    @Column(name = "method_id")
-    private int methodId;
+    @Column(name = "method_id", length = 36)
+    private String methodId;
 
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id", insertable = false, updatable = false)
