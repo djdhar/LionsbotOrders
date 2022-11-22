@@ -1,11 +1,12 @@
 package com.lionsbot.evaluation.dibyajyoti.entity;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class AuthenticationRequest implements Serializable {
 
 
-    private String userId;
+    private UUID userId;
     private String password;
     private String isAdmin;
 
@@ -18,11 +19,11 @@ public class AuthenticationRequest implements Serializable {
     }
 
 
-    public String getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
@@ -40,12 +41,12 @@ public class AuthenticationRequest implements Serializable {
 
     }
 
-    public AuthenticationRequest(String userId, String password) {
+    public AuthenticationRequest(UUID userId, String password) {
         this.setUserId(userId);
         this.setPassword(password);
     }
 
-    public AuthenticationRequest(String userId, String password, String isAdmin) {
+    public AuthenticationRequest(UUID userId, String password, String isAdmin) {
         this.setUserId(userId);
         this.setPassword(password);
         this.setIsAdmin(isAdmin);
