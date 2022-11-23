@@ -160,7 +160,7 @@ JSON Request Body (sample)
 #### Change password of a Customer (Restricted to that Customer only)
 
 ```http
-  POST http://localhost:9054//changepassword/{customer_id}
+  PUT http://localhost:9054//changepassword/{customer_id}
 ```
 
 JSON Request Body (sample)
