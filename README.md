@@ -1,3 +1,14 @@
+#### First Create an Admin in `admin_tbl` of `newdatabase`
+```
+mysql> use newdatabase;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> insert into admin_tbl values('a086f7a6-6a81-11ed-966d-5ad6242f82ff','passadmin');
+Query OK, 1 row affected (0.00 sec)
+```
+
 
 ## API Reference
 
